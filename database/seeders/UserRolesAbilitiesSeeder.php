@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 
 use App\Models\Abilities\Ability;
+use App\Models\AbilityUsers\AbilityUser;
 use App\Models\Roles\Role;
 use App\Models\User;
 use App\Models\UserStatuses\UserStatus;
@@ -77,6 +78,20 @@ class UserRolesAbilitiesSeeder extends Seeder
         $this->createUser(self::MANAGER_NAME, self::MANAGER_EMAIL, self::MANAGER_PASSWORD, Role::MANAGER);
 
         $this->createUser(self::USER_NAME, self::USER_EMAIL, self::USER_PASSWORD, Role::USER);
+
+
+        /**
+         * Add other User
+         */
+        User::factory(7)->create();
+
+
+
+        /**
+         * Create User All Abilities
+         */
+        $this->createAllAbilities(self::USER_NAME);
+
 
 
     }
@@ -278,7 +293,7 @@ class UserRolesAbilitiesSeeder extends Seeder
 
 
 
-        if($roleName == Role::MANAGER || $roleName == Role::USER){
+        if($roleName == Role::MANAGER){
 
             // Create ability_role
             $abilityList = Ability::where('name', EnumUserPermissions::MODULE_ABILITIES_LIST)->first();
@@ -297,5 +312,35 @@ class UserRolesAbilitiesSeeder extends Seeder
 
 
     }
+
+
+
+    /**
+     *
+     * Create All Abilities
+     *
+     * @param $name
+     * @return void
+     */
+    private function createAllAbilities($name)
+    {
+
+        $user = User::where('name', $name)->first();
+
+        $abilities = Ability::where('id', '>', 1)->get();
+
+
+        foreach ($abilities as $ability) {
+
+            AbilityUser::factory()->create([
+                'user_id' => $user->id,
+                'ability_id' => $ability->id,
+            ]);
+
+        }
+
+    }
+
+
 
 }
